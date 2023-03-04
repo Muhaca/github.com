@@ -22,14 +22,23 @@ func AllEmployee(w http.ResponseWriter, r *http.Request) {
 	db := config.Connect()
 	defer db.Close()
 
-	rows, err := db.Query("SELECT id, nama, kecamatan, kelurahan, user, tps, jumlah_suara FROM voting")
+	rows, err := db.Query("SELECT id, nama, kecamatan, kelurahan, user, tps, jumlah_suara, gambar FROM voting")
 
 	if err != nil {
 		log.Print(err)
 	}
 
 	for rows.Next() {
-		err = rows.Scan(&employee.Id, &employee.Nama, &employee.Kecamatan, &employee.Kelurahan, &employee.User, &employee.TPS, &employee.JumlahSuara)
+		err = rows.Scan(
+			&employee.Id,
+			&employee.Nama,
+			&employee.Kecamatan,
+			&employee.Kelurahan,
+			&employee.User,
+			&employee.TPS,
+			&employee.JumlahSuara,
+			&employee.Gambar,
+		)
 		if err != nil {
 			log.Fatal(err.Error())
 		} else {
@@ -228,8 +237,9 @@ func InsertEmployee(w http.ResponseWriter, r *http.Request) {
 	user := r.FormValue("user")
 	tps := r.FormValue("tps")
 	jumlah_suara := r.FormValue("jumlah_suara")
+	gambar := r.FormValue("gambar")
 
-	_, err = db.Exec("INSERT INTO voting(nama, kelurahan, kecamatan, user,tps, jumlah_suara) VALUES(?, ?, ?, ?, ?, ?)", nama, kelurahan, kecamatan, user, tps, jumlah_suara)
+	_, err = db.Exec("INSERT INTO voting(nama, kelurahan, kecamatan, user,tps, jumlah_suara, gambar) VALUES(?, ?, ?, ?, ?, ?, ?)", nama, kelurahan, kecamatan, user, tps, jumlah_suara, gambar)
 
 	if err != nil {
 		log.Print(err)
