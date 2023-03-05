@@ -393,153 +393,6 @@ type Result struct {
 	TotalSuara int    `json:"total_suara"`
 }
 
-// func GetAllData(w http.ResponseWriter, r *http.Request) {
-// 	// Prepare the SQL query
-// 	query := "SELECT kecamatan, MAX(CASE WHEN row_number = 1 THEN nama END) AS nama_1, MAX(CASE WHEN row_number = 2 THEN nama END) AS nama_2, MAX(CASE WHEN row_number = 3 THEN nama END) AS nama_3, SUM(jumlah_suara) AS total_suara FROM ( SELECT nama, kecamatan, jumlah_suara, ROW_NUMBER() OVER (PARTITION BY kecamatan ORDER BY jumlah_suara DESC) AS row_number FROM voting ) subquery WHERE row_number <= 3 GROUP BY kecamatan"
-
-// 	db := config.Connect()
-// 	defer db.Close()
-// 	// Execute the query and get a rows object
-// 	rows, err := db.Query(query)
-// 	if err != nil {
-// 		http.Error(w, err.Error(), http.StatusInternalServerError)
-// 		return
-// 	}
-// 	defer rows.Close()
-
-// 	// Iterate over each row and scan it into a Result object
-// 	var results []Result
-// 	for rows.Next() {
-// 		var result Result
-// 		if err := rows.Scan(&result.Kecamatan, &result.Nama1, &result.Nama2, &result.Nama3, &result.TotalSuara); err != nil {
-// 			http.Error(w, err.Error(), http.StatusInternalServerError)
-// 			return
-// 		}
-// 		results = append(results, result)
-// 	}
-// 	if err := rows.Err(); err != nil {
-// 		http.Error(w, err.Error(), http.StatusInternalServerError)
-// 		return
-// 	}
-
-// 	// Encode the results as JSON and send them as the response body
-// 	w.Header().Set("Content-Type", "application/json")
-// 	w.Header().Set("Access-Control-Allow-Origin", "*")
-// 	if err := json.NewEncoder(w).Encode(results); err != nil {
-// 		http.Error(w, err.Error(), http.StatusInternalServerError)
-// 		return
-// 	}
-// }
-
-// func GetAllData(w http.ResponseWriter, r *http.Request) {
-// 	// open a connection to your MySQL database
-// 	db := config.Connect()
-// 	defer db.Close()
-
-// 	// execute your SQL query to retrieve the sum of jumlah_suara and nama grouped by nama
-// 	rows, err := db.Query("SELECT SUM(jumlah_suara) as total_suara, nama, kecamatan FROM voting GROUP BY kecamatan")
-// 	if err != nil {
-// 		http.Error(w, err.Error(), http.StatusInternalServerError)
-// 		return
-// 	}
-// 	defer rows.Close()
-
-// 	// create a slice to store the results
-// 	var results []map[string]interface{}
-
-// 	// loop through the result set and append each row to the results slice
-// 	for rows.Next() {
-// 		var totalSuara int
-// 		var nama string
-// 		var kecamatan string
-// 		if err := rows.Scan(&totalSuara, &nama, &kecamatan); err != nil {
-// 			http.Error(w, err.Error(), http.StatusInternalServerError)
-// 			return
-// 		}
-// 		result := make(map[string]interface{})
-// 		result["total_suara"] = totalSuara
-// 		result["nama"] = nama
-// 		result["kecamatan"] = kecamatan
-// 		results = append(results, result)
-// 	}
-
-// 	// encode the results slice as JSON and write it to the response
-// 	w.Header().Set("Content-Type", "application/json")
-// 	w.Header().Set("Access-Control-Allow-Origin", "*")
-// 	if err := json.NewEncoder(w).Encode(results); err != nil {
-// 		http.Error(w, err.Error(), http.StatusInternalServerError)
-// 		return
-// 	}
-// }
-
-// func GetAllData(w http.ResponseWriter, r *http.Request) {
-// 	db := config.Connect()
-// 	defer db.Close()
-
-// 	var result []map[string]interface{}
-// 	rows, err := db.Query(`SELECT kecamatan,
-// 	MAX(CASE WHEN rn = 1 THEN nama END) AS nama_1,
-// 	MAX(CASE WHEN rn = 1 THEN jumlah_suara END) AS total_suara_1,
-// 	MAX(CASE WHEN rn = 2 THEN nama END) AS nama_2,
-// 	MAX(CASE WHEN rn = 2 THEN jumlah_suara END) AS total_suara_2,
-// 	MAX(CASE WHEN rn = 3 THEN nama END) AS nama_3,
-// 	MAX(CASE WHEN rn = 3 THEN jumlah_suara END) AS total_suara_3
-//   FROM (
-// 	SELECT kecamatan,
-// 	  nama,
-// 	  jumlah_suara,
-// 	  ROW_NUMBER() OVER (PARTITION BY kecamatan ORDER BY jumlah_suara DESC) AS rn
-// 	FROM voting
-//   ) t
-//   WHERE rn <= 3
-//   GROUP BY kecamatan`)
-// 	if err != nil {
-// 		log.Fatal(err)
-// 	}
-// 	defer rows.Close()
-
-// 	for rows.Next() {
-// 		var kecamatan string
-// 		var nama1 string
-// 		var total_suara1 int
-// 		var nama2 sql.NullString
-// 		var total_suara2 sql.NullInt64
-// 		var nama3 sql.NullString
-// 		var total_suara3 sql.NullInt64
-
-// 		err := rows.Scan(&kecamatan, &nama1, &total_suara1, &nama2, &total_suara2, &nama3, &total_suara3)
-// 		if err != nil {
-// 			log.Fatal(err)
-// 		}
-
-// 		resultRow := make(map[string]interface{})
-// 		resultRow["kecamatan"] = kecamatan
-// 		suara := []map[string]interface{}{}
-// 		if nama1 != "" {
-// 			suara = append(suara, map[string]interface{}{"nama_1": nama1, "total_suara_1": total_suara1})
-// 		}
-// 		if nama2.Valid {
-// 			suara = append(suara, map[string]interface{}{"nama_2": nama2.String, "total_suara_2": int(total_suara2.Int64)})
-// 		}
-// 		if nama3.Valid {
-// 			suara = append(suara, map[string]interface{}{"nama_3": nama3.String, "total_suara_3": int(total_suara3.Int64)})
-// 		}
-// 		resultRow["suara"] = suara
-
-// 		result = append(result, resultRow)
-// 	}
-
-// 	response, err := json.Marshal(result)
-// 	if err != nil {
-// 		log.Fatal(err)
-// 	}
-
-// 	w.Header().Set("Content-Type", "application/json")
-// 	w.Header().Set("Access-Control-Allow-Origin", "*")
-// 	w.WriteHeader(http.StatusOK)
-// 	w.Write(response)
-// }
-
 func GetAllData(w http.ResponseWriter, r *http.Request) {
 	// Open database connection
 	db := config.Connect()
@@ -548,26 +401,26 @@ func GetAllData(w http.ResponseWriter, r *http.Request) {
 	// Execute the query
 	rows, err := db.Query(`
         SELECT kecamatan, 
-               MAX(CASE WHEN rn = 1 THEN nama END) AS nama_1, 
-               MAX(CASE WHEN rn = 1 THEN jumlah_suara END) AS total_suara_1,
-               MAX(CASE WHEN rn = 2 THEN nama END) AS nama_2, 
-               MAX(CASE WHEN rn = 2 THEN jumlah_suara END) AS total_suara_2,
-               MAX(CASE WHEN rn = 3 THEN nama END) AS nama_3, 
-               MAX(CASE WHEN rn = 3 THEN jumlah_suara END) AS total_suara_3,
-			   MAX(CASE WHEN rn = 4 THEN nama END) AS nama_4, 
-               MAX(CASE WHEN rn = 4 THEN jumlah_suara END) AS total_suara_4,
-			   MAX(CASE WHEN rn = 5 THEN nama END) AS nama_5, 
-               MAX(CASE WHEN rn = 5 THEN jumlah_suara END) AS total_suara_5,
-			   MAX(CASE WHEN rn = 6 THEN nama END) AS nama_6, 
-               MAX(CASE WHEN rn = 6 THEN jumlah_suara END) AS total_suara_6,
-			   MAX(CASE WHEN rn = 7 THEN nama END) AS nama_7, 
-               MAX(CASE WHEN rn = 7 THEN jumlah_suara END) AS total_suara_7,
-			   MAX(CASE WHEN rn = 8 THEN nama END) AS nama_8, 
-               MAX(CASE WHEN rn = 8 THEN jumlah_suara END) AS total_suara_8,
-			   MAX(CASE WHEN rn = 9 THEN nama END) AS nama_9, 
-               MAX(CASE WHEN rn = 9 THEN jumlah_suara END) AS total_suara_9,
-			   MAX(CASE WHEN rn = 10 THEN nama END) AS nama_10, 
-               MAX(CASE WHEN rn = 10 THEN jumlah_suara END) AS total_suara_10
+		MAX(CASE WHEN rn = 1 THEN nama END) AS nama_1, 
+		MAX(CASE WHEN rn = 1 THEN jumlah_suara END) AS total_suara_1,
+		MAX(CASE WHEN rn = 2 THEN nama END) AS nama_2, 
+		MAX(CASE WHEN rn = 2 THEN jumlah_suara END) AS total_suara_2,
+		MAX(CASE WHEN rn = 3 THEN nama END) AS nama_3, 
+		MAX(CASE WHEN rn = 3 THEN jumlah_suara END) AS total_suara_3,
+		COALESCE(MAX(CASE WHEN rn = 4 THEN nama END), '') AS nama_4, 
+		COALESCE(MAX(CASE WHEN rn = 4 THEN jumlah_suara END), 0) AS total_suara_4,
+		COALESCE(MAX(CASE WHEN rn = 5 THEN nama END), '') AS nama_5, 
+		COALESCE(MAX(CASE WHEN rn = 5 THEN jumlah_suara END), 0) AS total_suara_5,
+		COALESCE(MAX(CASE WHEN rn = 6 THEN nama END), '') AS nama_6, 
+		COALESCE(MAX(CASE WHEN rn = 6 THEN jumlah_suara END), 0) AS total_suara_6,
+		COALESCE(MAX(CASE WHEN rn = 7 THEN nama END), '') AS nama_7, 
+		COALESCE(MAX(CASE WHEN rn = 7 THEN jumlah_suara END), 0) AS total_suara_7,
+		COALESCE(MAX(CASE WHEN rn = 8 THEN nama END), '') AS nama_8, 
+		COALESCE(MAX(CASE WHEN rn = 8 THEN jumlah_suara END), 0) AS total_suara_8,
+		COALESCE(MAX(CASE WHEN rn = 9 THEN nama END), '') AS nama_9, 
+		COALESCE(MAX(CASE WHEN rn = 9 THEN jumlah_suara END), 0) AS total_suara_9,
+		COALESCE(MAX(CASE WHEN rn = 10 THEN nama END), '') AS nama_10, 
+		COALESCE(MAX(CASE WHEN rn = 10 THEN jumlah_suara END), 0) AS total_suara_10
         FROM (
             SELECT kecamatan, 
                    nama, 
@@ -587,8 +440,8 @@ func GetAllData(w http.ResponseWriter, r *http.Request) {
 	var result []map[string]interface{}
 	for rows.Next() {
 		var kecamatan string
-		var suara1, suara2, suara3, suara4, suara5, suara6, suara7, suara8, suara9, suara10 sql.NullInt64
-		var nama1, nama2, nama3, nama4, nama5, nama6, nama7, nama8, nama9, nama10 sql.NullString
+		var suara1, suara2, suara3, suara4, suara5, suara6, suara7, suara8, suara9, suara10 int
+		var nama1, nama2, nama3, nama4, nama5, nama6, nama7, nama8, nama9, nama10 string
 		err = rows.Scan(&kecamatan, &nama1, &suara1, &nama2, &suara2, &nama3, &suara3, &nama4, &suara4, &nama5, &suara5, &nama6, &suara6, &nama7, &suara7, &nama8, &suara8, &nama9, &suara9, &nama10, &suara10)
 		if err != nil {
 			log.Fatal(err)
@@ -613,6 +466,7 @@ func GetAllData(w http.ResponseWriter, r *http.Request) {
 
 	// Set response header
 	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
 
 	// Encode and return the response data
 	err = json.NewEncoder(w).Encode(result)
@@ -620,74 +474,6 @@ func GetAllData(w http.ResponseWriter, r *http.Request) {
 		log.Fatal(err)
 	}
 }
-
-// func GetAllDataKel(w http.ResponseWriter, r *http.Request) {
-// 	db := config.Connect()
-// 	defer db.Close()
-
-// 	var result []map[string]interface{}
-// 	rows, err := db.Query("SELECT kelurahan, " +
-// 		"MAX(CASE WHEN rn = 1 THEN nama END) AS nama_1, " +
-// 		"MAX(CASE WHEN rn = 1 THEN jumlah_suara END) AS total_suara_1, " +
-// 		"MAX(CASE WHEN rn = 2 THEN nama END) AS nama_2, " +
-// 		"MAX(CASE WHEN rn = 2 THEN jumlah_suara END) AS total_suara_2, " +
-// 		"MAX(CASE WHEN rn = 3 THEN nama END) AS nama_3, " +
-// 		"MAX(CASE WHEN rn = 3 THEN jumlah_suara END) AS total_suara_3 " +
-// 		"FROM ( " +
-// 		"  SELECT kelurahan, " +
-// 		"         nama, " +
-// 		"         jumlah_suara, " +
-// 		"         ROW_NUMBER() OVER (PARTITION BY kelurahan ORDER BY jumlah_suara DESC) AS rn " +
-// 		"  FROM voting " +
-// 		") t " +
-// 		"WHERE rn <= 3 " +
-// 		"GROUP BY kelurahan")
-// 	if err != nil {
-// 		log.Fatal(err)
-// 	}
-// 	defer rows.Close()
-
-// 	for rows.Next() {
-// 		var kelurahan string
-// 		var nama1 string
-// 		var total_suara1 int
-// 		var nama2 sql.NullString
-// 		var total_suara2 sql.NullInt64
-// 		var nama3 sql.NullString
-// 		var total_suara3 sql.NullInt64
-
-// 		err := rows.Scan(&kelurahan, &nama1, &total_suara1, &nama2, &total_suara2, &nama3, &total_suara3)
-// 		if err != nil {
-// 			log.Fatal(err)
-// 		}
-
-// 		resultRow := make(map[string]interface{})
-// 		resultRow["kelurahan"] = kelurahan
-// 		suara := []map[string]interface{}{}
-// 		if nama1 != "" {
-// 			suara = append(suara, map[string]interface{}{"nama_1": nama1, "total_suara_1": total_suara1})
-// 		}
-// 		if nama2.Valid {
-// 			suara = append(suara, map[string]interface{}{"nama_2": nama2.String, "total_suara_2": int(total_suara2.Int64)})
-// 		}
-// 		if nama3.Valid {
-// 			suara = append(suara, map[string]interface{}{"nama_3": nama3.String, "total_suara_3": int(total_suara3.Int64)})
-// 		}
-// 		resultRow["suara"] = suara
-
-// 		result = append(result, resultRow)
-// 	}
-
-// 	response, err := json.Marshal(result)
-// 	if err != nil {
-// 		log.Fatal(err)
-// 	}
-
-// 	w.Header().Set("Content-Type", "application/json")
-// 	w.Header().Set("Access-Control-Allow-Origin", "*")
-// 	w.WriteHeader(http.StatusOK)
-// 	w.Write(response)
-// }
 
 func GetAllDataKel(w http.ResponseWriter, r *http.Request) {
 	// Open database connection
@@ -697,26 +483,26 @@ func GetAllDataKel(w http.ResponseWriter, r *http.Request) {
 	// Execute the query
 	rows, err := db.Query(`
         SELECT kelurahan, 
-               MAX(CASE WHEN rn = 1 THEN nama END) AS nama_1, 
-               MAX(CASE WHEN rn = 1 THEN jumlah_suara END) AS total_suara_1,
-               MAX(CASE WHEN rn = 2 THEN nama END) AS nama_2, 
-               MAX(CASE WHEN rn = 2 THEN jumlah_suara END) AS total_suara_2,
-               MAX(CASE WHEN rn = 3 THEN nama END) AS nama_3, 
-               MAX(CASE WHEN rn = 3 THEN jumlah_suara END) AS total_suara_3,
-			   MAX(CASE WHEN rn = 4 THEN nama END) AS nama_4, 
-               MAX(CASE WHEN rn = 4 THEN jumlah_suara END) AS total_suara_4,
-			   MAX(CASE WHEN rn = 5 THEN nama END) AS nama_5, 
-               MAX(CASE WHEN rn = 5 THEN jumlah_suara END) AS total_suara_5,
-			   MAX(CASE WHEN rn = 6 THEN nama END) AS nama_6, 
-               MAX(CASE WHEN rn = 6 THEN jumlah_suara END) AS total_suara_6,
-			   MAX(CASE WHEN rn = 7 THEN nama END) AS nama_7, 
-               MAX(CASE WHEN rn = 7 THEN jumlah_suara END) AS total_suara_7,
-			   MAX(CASE WHEN rn = 8 THEN nama END) AS nama_8, 
-               MAX(CASE WHEN rn = 8 THEN jumlah_suara END) AS total_suara_8,
-			   MAX(CASE WHEN rn = 9 THEN nama END) AS nama_9, 
-               MAX(CASE WHEN rn = 9 THEN jumlah_suara END) AS total_suara_9,
-			   MAX(CASE WHEN rn = 10 THEN nama END) AS nama_10, 
-               MAX(CASE WHEN rn = 10 THEN jumlah_suara END) AS total_suara_10
+		MAX(CASE WHEN rn = 1 THEN nama END) AS nama_1, 
+		MAX(CASE WHEN rn = 1 THEN jumlah_suara END) AS total_suara_1,
+		MAX(CASE WHEN rn = 2 THEN nama END) AS nama_2, 
+		MAX(CASE WHEN rn = 2 THEN jumlah_suara END) AS total_suara_2,
+		MAX(CASE WHEN rn = 3 THEN nama END) AS nama_3, 
+		MAX(CASE WHEN rn = 3 THEN jumlah_suara END) AS total_suara_3,
+		COALESCE(MAX(CASE WHEN rn = 4 THEN nama END), '') AS nama_4, 
+		COALESCE(MAX(CASE WHEN rn = 4 THEN jumlah_suara END), 0) AS total_suara_4,
+		COALESCE(MAX(CASE WHEN rn = 5 THEN nama END), '') AS nama_5, 
+		COALESCE(MAX(CASE WHEN rn = 5 THEN jumlah_suara END), 0) AS total_suara_5,
+		COALESCE(MAX(CASE WHEN rn = 6 THEN nama END), '') AS nama_6, 
+		COALESCE(MAX(CASE WHEN rn = 6 THEN jumlah_suara END), 0) AS total_suara_6,
+		COALESCE(MAX(CASE WHEN rn = 7 THEN nama END), '') AS nama_7, 
+		COALESCE(MAX(CASE WHEN rn = 7 THEN jumlah_suara END), 0) AS total_suara_7,
+		COALESCE(MAX(CASE WHEN rn = 8 THEN nama END), '') AS nama_8, 
+		COALESCE(MAX(CASE WHEN rn = 8 THEN jumlah_suara END), 0) AS total_suara_8,
+		COALESCE(MAX(CASE WHEN rn = 9 THEN nama END), '') AS nama_9, 
+		COALESCE(MAX(CASE WHEN rn = 9 THEN jumlah_suara END), 0) AS total_suara_9,
+		COALESCE(MAX(CASE WHEN rn = 10 THEN nama END), '') AS nama_10, 
+		COALESCE(MAX(CASE WHEN rn = 10 THEN jumlah_suara END), 0) AS total_suara_10
         FROM (
             SELECT kelurahan, 
                    nama, 
@@ -736,23 +522,23 @@ func GetAllDataKel(w http.ResponseWriter, r *http.Request) {
 	var result []map[string]interface{}
 	for rows.Next() {
 		var kelurahan string
-		var suara1, suara2, suara3, suara4, suara5, suara6, suara7, suara8, suara9, suara10 int
-		var nama1, nama2, nama3, nama4, nama5, nama6, nama7, nama8, nama9, nama10 string
+		var suara1, suara2, suara3, suara4, suara5, suara6, suara7, suara8, suara9, suara10 sql.NullInt64
+		var nama1, nama2, nama3, nama4, nama5, nama6, nama7, nama8, nama9, nama10 sql.NullString
 		err = rows.Scan(&kelurahan, &nama1, &suara1, &nama2, &suara2, &nama3, &suara3, &nama4, &suara4, &nama5, &suara5, &nama6, &suara6, &nama7, &suara7, &nama8, &suara8, &nama9, &suara9, &nama10, &suara10)
 		if err != nil {
 			log.Fatal(err)
 		}
 		suara := []map[string]interface{}{
-			{"nama_1": nama1, "total_suara": suara1},
-			{"nama_2": nama2, "total_suara": suara2},
-			{"nama_3": nama3, "total_suara": suara3},
-			{"nama_4": nama4, "total_suara": suara4},
-			{"nama_5": nama5, "total_suara": suara5},
-			{"nama_6": nama6, "total_suara": suara6},
-			{"nama_7": nama7, "total_suara": suara7},
-			{"nama_8": nama8, "total_suara": suara8},
-			{"nama_9": nama9, "total_suara": suara9},
-			{"nama_10": nama10, "total_suara": suara10},
+			{"nama_1": replaceNullString(nama1), "total_suara": replaceNullInt(suara1)},
+			{"nama_2": replaceNullString(nama2), "total_suara": replaceNullInt(suara2)},
+			{"nama_3": replaceNullString(nama3), "total_suara": replaceNullInt(suara3)},
+			{"nama_4": replaceNullString(nama4), "total_suara": replaceNullInt(suara4)},
+			{"nama_5": replaceNullString(nama5), "total_suara": replaceNullInt(suara5)},
+			{"nama_6": replaceNullString(nama6), "total_suara": replaceNullInt(suara6)},
+			{"nama_7": replaceNullString(nama7), "total_suara": replaceNullInt(suara7)},
+			{"nama_8": replaceNullString(nama8), "total_suara": replaceNullInt(suara8)},
+			{"nama_9": replaceNullString(nama9), "total_suara": replaceNullInt(suara9)},
+			{"nama_10": replaceNullString(nama10), "total_suara": replaceNullInt(suara10)},
 		}
 		result = append(result, map[string]interface{}{"kelurahan": kelurahan, "suara": suara})
 	}
@@ -762,10 +548,27 @@ func GetAllDataKel(w http.ResponseWriter, r *http.Request) {
 
 	// Set response header
 	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
 
 	// Encode and return the response data
 	err = json.NewEncoder(w).Encode(result)
 	if err != nil {
 		log.Fatal(err)
 	}
+}
+
+// Helper function to replace null string with empty string
+func replaceNullString(s sql.NullString) string {
+	if s.Valid {
+		return s.String
+	}
+	return ""
+}
+
+// Helper function to replace null integer with zero
+func replaceNullInt(i sql.NullInt64) int {
+	if i.Valid {
+		return int(i.Int64)
+	}
+	return 0
 }
