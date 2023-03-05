@@ -56,23 +56,6 @@ func AllEmployee(w http.ResponseWriter, r *http.Request) {
 
 }
 
-// tambahin di model.go struct dibawah di
-
-// type Kecamatan struct {
-// 	Kecamatan string `json:"kecamatan"`
-// }
-// type Kelurahan struct {
-// 	Kelurahan string `json:"kelurahan"`
-// }
-
-// type KecamatanResponse struct {
-// 	Kecamatan string `json:"kecamatan"`
-// }
-
-// type KelurahanResponse struct {
-// 	Kelurahan string `json:"kelurahan"`
-// }
-
 // AllEmployee = Select Employee API
 func GetKecamatan(w http.ResponseWriter, r *http.Request) {
 	var kecamatan model.Kecamatan
@@ -489,138 +472,300 @@ type Result struct {
 // 	}
 // }
 
+// func GetAllData(w http.ResponseWriter, r *http.Request) {
+// 	db := config.Connect()
+// 	defer db.Close()
+
+// 	var result []map[string]interface{}
+// 	rows, err := db.Query(`SELECT kecamatan,
+// 	MAX(CASE WHEN rn = 1 THEN nama END) AS nama_1,
+// 	MAX(CASE WHEN rn = 1 THEN jumlah_suara END) AS total_suara_1,
+// 	MAX(CASE WHEN rn = 2 THEN nama END) AS nama_2,
+// 	MAX(CASE WHEN rn = 2 THEN jumlah_suara END) AS total_suara_2,
+// 	MAX(CASE WHEN rn = 3 THEN nama END) AS nama_3,
+// 	MAX(CASE WHEN rn = 3 THEN jumlah_suara END) AS total_suara_3
+//   FROM (
+// 	SELECT kecamatan,
+// 	  nama,
+// 	  jumlah_suara,
+// 	  ROW_NUMBER() OVER (PARTITION BY kecamatan ORDER BY jumlah_suara DESC) AS rn
+// 	FROM voting
+//   ) t
+//   WHERE rn <= 3
+//   GROUP BY kecamatan`)
+// 	if err != nil {
+// 		log.Fatal(err)
+// 	}
+// 	defer rows.Close()
+
+// 	for rows.Next() {
+// 		var kecamatan string
+// 		var nama1 string
+// 		var total_suara1 int
+// 		var nama2 sql.NullString
+// 		var total_suara2 sql.NullInt64
+// 		var nama3 sql.NullString
+// 		var total_suara3 sql.NullInt64
+
+// 		err := rows.Scan(&kecamatan, &nama1, &total_suara1, &nama2, &total_suara2, &nama3, &total_suara3)
+// 		if err != nil {
+// 			log.Fatal(err)
+// 		}
+
+// 		resultRow := make(map[string]interface{})
+// 		resultRow["kecamatan"] = kecamatan
+// 		suara := []map[string]interface{}{}
+// 		if nama1 != "" {
+// 			suara = append(suara, map[string]interface{}{"nama_1": nama1, "total_suara_1": total_suara1})
+// 		}
+// 		if nama2.Valid {
+// 			suara = append(suara, map[string]interface{}{"nama_2": nama2.String, "total_suara_2": int(total_suara2.Int64)})
+// 		}
+// 		if nama3.Valid {
+// 			suara = append(suara, map[string]interface{}{"nama_3": nama3.String, "total_suara_3": int(total_suara3.Int64)})
+// 		}
+// 		resultRow["suara"] = suara
+
+// 		result = append(result, resultRow)
+// 	}
+
+// 	response, err := json.Marshal(result)
+// 	if err != nil {
+// 		log.Fatal(err)
+// 	}
+
+// 	w.Header().Set("Content-Type", "application/json")
+// 	w.Header().Set("Access-Control-Allow-Origin", "*")
+// 	w.WriteHeader(http.StatusOK)
+// 	w.Write(response)
+// }
+
 func GetAllData(w http.ResponseWriter, r *http.Request) {
+	// Open database connection
 	db := config.Connect()
 	defer db.Close()
 
-	var result []map[string]interface{}
-	rows, err := db.Query("SELECT kecamatan, " +
-		"MAX(CASE WHEN rn = 1 THEN nama END) AS nama_1, " +
-		"MAX(CASE WHEN rn = 1 THEN jumlah_suara END) AS total_suara_1, " +
-		"MAX(CASE WHEN rn = 2 THEN nama END) AS nama_2, " +
-		"MAX(CASE WHEN rn = 2 THEN jumlah_suara END) AS total_suara_2, " +
-		"MAX(CASE WHEN rn = 3 THEN nama END) AS nama_3, " +
-		"MAX(CASE WHEN rn = 3 THEN jumlah_suara END) AS total_suara_3 " +
-		"FROM ( " +
-		"  SELECT kecamatan, " +
-		"         nama, " +
-		"         jumlah_suara, " +
-		"         ROW_NUMBER() OVER (PARTITION BY kecamatan ORDER BY jumlah_suara DESC) AS rn " +
-		"  FROM voting " +
-		") t " +
-		"WHERE rn <= 3 " +
-		"GROUP BY kecamatan")
+	// Execute the query
+	rows, err := db.Query(`
+        SELECT kecamatan, 
+               MAX(CASE WHEN rn = 1 THEN nama END) AS nama_1, 
+               MAX(CASE WHEN rn = 1 THEN jumlah_suara END) AS total_suara_1,
+               MAX(CASE WHEN rn = 2 THEN nama END) AS nama_2, 
+               MAX(CASE WHEN rn = 2 THEN jumlah_suara END) AS total_suara_2,
+               MAX(CASE WHEN rn = 3 THEN nama END) AS nama_3, 
+               MAX(CASE WHEN rn = 3 THEN jumlah_suara END) AS total_suara_3,
+			   MAX(CASE WHEN rn = 4 THEN nama END) AS nama_4, 
+               MAX(CASE WHEN rn = 4 THEN jumlah_suara END) AS total_suara_4,
+			   MAX(CASE WHEN rn = 5 THEN nama END) AS nama_5, 
+               MAX(CASE WHEN rn = 5 THEN jumlah_suara END) AS total_suara_5,
+			   MAX(CASE WHEN rn = 6 THEN nama END) AS nama_6, 
+               MAX(CASE WHEN rn = 6 THEN jumlah_suara END) AS total_suara_6,
+			   MAX(CASE WHEN rn = 7 THEN nama END) AS nama_7, 
+               MAX(CASE WHEN rn = 7 THEN jumlah_suara END) AS total_suara_7,
+			   MAX(CASE WHEN rn = 8 THEN nama END) AS nama_8, 
+               MAX(CASE WHEN rn = 8 THEN jumlah_suara END) AS total_suara_8,
+			   MAX(CASE WHEN rn = 9 THEN nama END) AS nama_9, 
+               MAX(CASE WHEN rn = 9 THEN jumlah_suara END) AS total_suara_9,
+			   MAX(CASE WHEN rn = 10 THEN nama END) AS nama_10, 
+               MAX(CASE WHEN rn = 10 THEN jumlah_suara END) AS total_suara_10
+        FROM (
+            SELECT kecamatan, 
+                   nama, 
+                   jumlah_suara, 
+                   ROW_NUMBER() OVER (PARTITION BY kecamatan ORDER BY jumlah_suara DESC) AS rn
+            FROM voting
+        ) t
+        WHERE rn <= 10
+        GROUP BY kecamatan
+    `)
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer rows.Close()
 
+	// Create the response data
+	var result []map[string]interface{}
 	for rows.Next() {
 		var kecamatan string
-		var nama1 string
-		var total_suara1 int
-		var nama2 sql.NullString
-		var total_suara2 sql.NullInt64
-		var nama3 sql.NullString
-		var total_suara3 sql.NullInt64
-
-		err := rows.Scan(&kecamatan, &nama1, &total_suara1, &nama2, &total_suara2, &nama3, &total_suara3)
+		var suara1, suara2, suara3, suara4, suara5, suara6, suara7, suara8, suara9, suara10 int
+		var nama1, nama2, nama3, nama4, nama5, nama6, nama7, nama8, nama9, nama10 string
+		err = rows.Scan(&kecamatan, &nama1, &suara1, &nama2, &suara2, &nama3, &suara3, &nama4, &suara4, &nama5, &suara5, &nama6, &suara6, &nama7, &suara7, &nama8, &suara8, &nama9, &suara9, &nama10, &suara10)
 		if err != nil {
 			log.Fatal(err)
 		}
-
-		resultRow := make(map[string]interface{})
-		resultRow["kecamatan"] = kecamatan
-		suara := []map[string]interface{}{}
-		if nama1 != "" {
-			suara = append(suara, map[string]interface{}{"nama_1": nama1, "total_suara_1": total_suara1})
+		suara := []map[string]interface{}{
+			{"nama_1": nama1, "total_suara": suara1},
+			{"nama_2": nama2, "total_suara": suara2},
+			{"nama_3": nama3, "total_suara": suara3},
+			{"nama_4": nama4, "total_suara": suara4},
+			{"nama_5": nama5, "total_suara": suara5},
+			{"nama_6": nama6, "total_suara": suara6},
+			{"nama_7": nama7, "total_suara": suara7},
+			{"nama_8": nama8, "total_suara": suara8},
+			{"nama_9": nama9, "total_suara": suara9},
+			{"nama_10": nama10, "total_suara": suara10},
 		}
-		if nama2.Valid {
-			suara = append(suara, map[string]interface{}{"nama_2": nama2.String, "total_suara_2": int(total_suara2.Int64)})
-		}
-		if nama3.Valid {
-			suara = append(suara, map[string]interface{}{"nama_3": nama3.String, "total_suara_3": int(total_suara3.Int64)})
-		}
-		resultRow["suara"] = suara
-
-		result = append(result, resultRow)
+		result = append(result, map[string]interface{}{"kecamatan": kecamatan, "suara": suara})
 	}
-
-	response, err := json.Marshal(result)
-	if err != nil {
+	if err = rows.Err(); err != nil {
 		log.Fatal(err)
 	}
 
+	// Set response header
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-	w.WriteHeader(http.StatusOK)
-	w.Write(response)
+
+	// Encode and return the response data
+	err = json.NewEncoder(w).Encode(result)
+	if err != nil {
+		log.Fatal(err)
+	}
 }
 
+// func GetAllDataKel(w http.ResponseWriter, r *http.Request) {
+// 	db := config.Connect()
+// 	defer db.Close()
+
+// 	var result []map[string]interface{}
+// 	rows, err := db.Query("SELECT kelurahan, " +
+// 		"MAX(CASE WHEN rn = 1 THEN nama END) AS nama_1, " +
+// 		"MAX(CASE WHEN rn = 1 THEN jumlah_suara END) AS total_suara_1, " +
+// 		"MAX(CASE WHEN rn = 2 THEN nama END) AS nama_2, " +
+// 		"MAX(CASE WHEN rn = 2 THEN jumlah_suara END) AS total_suara_2, " +
+// 		"MAX(CASE WHEN rn = 3 THEN nama END) AS nama_3, " +
+// 		"MAX(CASE WHEN rn = 3 THEN jumlah_suara END) AS total_suara_3 " +
+// 		"FROM ( " +
+// 		"  SELECT kelurahan, " +
+// 		"         nama, " +
+// 		"         jumlah_suara, " +
+// 		"         ROW_NUMBER() OVER (PARTITION BY kelurahan ORDER BY jumlah_suara DESC) AS rn " +
+// 		"  FROM voting " +
+// 		") t " +
+// 		"WHERE rn <= 3 " +
+// 		"GROUP BY kelurahan")
+// 	if err != nil {
+// 		log.Fatal(err)
+// 	}
+// 	defer rows.Close()
+
+// 	for rows.Next() {
+// 		var kelurahan string
+// 		var nama1 string
+// 		var total_suara1 int
+// 		var nama2 sql.NullString
+// 		var total_suara2 sql.NullInt64
+// 		var nama3 sql.NullString
+// 		var total_suara3 sql.NullInt64
+
+// 		err := rows.Scan(&kelurahan, &nama1, &total_suara1, &nama2, &total_suara2, &nama3, &total_suara3)
+// 		if err != nil {
+// 			log.Fatal(err)
+// 		}
+
+// 		resultRow := make(map[string]interface{})
+// 		resultRow["kelurahan"] = kelurahan
+// 		suara := []map[string]interface{}{}
+// 		if nama1 != "" {
+// 			suara = append(suara, map[string]interface{}{"nama_1": nama1, "total_suara_1": total_suara1})
+// 		}
+// 		if nama2.Valid {
+// 			suara = append(suara, map[string]interface{}{"nama_2": nama2.String, "total_suara_2": int(total_suara2.Int64)})
+// 		}
+// 		if nama3.Valid {
+// 			suara = append(suara, map[string]interface{}{"nama_3": nama3.String, "total_suara_3": int(total_suara3.Int64)})
+// 		}
+// 		resultRow["suara"] = suara
+
+// 		result = append(result, resultRow)
+// 	}
+
+// 	response, err := json.Marshal(result)
+// 	if err != nil {
+// 		log.Fatal(err)
+// 	}
+
+// 	w.Header().Set("Content-Type", "application/json")
+// 	w.Header().Set("Access-Control-Allow-Origin", "*")
+// 	w.WriteHeader(http.StatusOK)
+// 	w.Write(response)
+// }
+
 func GetAllDataKel(w http.ResponseWriter, r *http.Request) {
+	// Open database connection
 	db := config.Connect()
 	defer db.Close()
 
-	var result []map[string]interface{}
-	rows, err := db.Query("SELECT kelurahan, " +
-		"MAX(CASE WHEN rn = 1 THEN nama END) AS nama_1, " +
-		"MAX(CASE WHEN rn = 1 THEN jumlah_suara END) AS total_suara_1, " +
-		"MAX(CASE WHEN rn = 2 THEN nama END) AS nama_2, " +
-		"MAX(CASE WHEN rn = 2 THEN jumlah_suara END) AS total_suara_2, " +
-		"MAX(CASE WHEN rn = 3 THEN nama END) AS nama_3, " +
-		"MAX(CASE WHEN rn = 3 THEN jumlah_suara END) AS total_suara_3 " +
-		"FROM ( " +
-		"  SELECT kelurahan, " +
-		"         nama, " +
-		"         jumlah_suara, " +
-		"         ROW_NUMBER() OVER (PARTITION BY kelurahan ORDER BY jumlah_suara DESC) AS rn " +
-		"  FROM voting " +
-		") t " +
-		"WHERE rn <= 3 " +
-		"GROUP BY kelurahan")
+	// Execute the query
+	rows, err := db.Query(`
+        SELECT kelurahan, 
+               MAX(CASE WHEN rn = 1 THEN nama END) AS nama_1, 
+               MAX(CASE WHEN rn = 1 THEN jumlah_suara END) AS total_suara_1,
+               MAX(CASE WHEN rn = 2 THEN nama END) AS nama_2, 
+               MAX(CASE WHEN rn = 2 THEN jumlah_suara END) AS total_suara_2,
+               MAX(CASE WHEN rn = 3 THEN nama END) AS nama_3, 
+               MAX(CASE WHEN rn = 3 THEN jumlah_suara END) AS total_suara_3,
+			   MAX(CASE WHEN rn = 4 THEN nama END) AS nama_4, 
+               MAX(CASE WHEN rn = 4 THEN jumlah_suara END) AS total_suara_4,
+			   MAX(CASE WHEN rn = 5 THEN nama END) AS nama_5, 
+               MAX(CASE WHEN rn = 5 THEN jumlah_suara END) AS total_suara_5,
+			   MAX(CASE WHEN rn = 6 THEN nama END) AS nama_6, 
+               MAX(CASE WHEN rn = 6 THEN jumlah_suara END) AS total_suara_6,
+			   MAX(CASE WHEN rn = 7 THEN nama END) AS nama_7, 
+               MAX(CASE WHEN rn = 7 THEN jumlah_suara END) AS total_suara_7,
+			   MAX(CASE WHEN rn = 8 THEN nama END) AS nama_8, 
+               MAX(CASE WHEN rn = 8 THEN jumlah_suara END) AS total_suara_8,
+			   MAX(CASE WHEN rn = 9 THEN nama END) AS nama_9, 
+               MAX(CASE WHEN rn = 9 THEN jumlah_suara END) AS total_suara_9,
+			   MAX(CASE WHEN rn = 10 THEN nama END) AS nama_10, 
+               MAX(CASE WHEN rn = 10 THEN jumlah_suara END) AS total_suara_10
+        FROM (
+            SELECT kelurahan, 
+                   nama, 
+                   jumlah_suara, 
+                   ROW_NUMBER() OVER (PARTITION BY kecamatan ORDER BY jumlah_suara DESC) AS rn
+            FROM voting
+        ) t
+        WHERE rn <= 10
+        GROUP BY kelurahan
+    `)
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer rows.Close()
 
+	// Create the response data
+	var result []map[string]interface{}
 	for rows.Next() {
 		var kelurahan string
-		var nama1 string
-		var total_suara1 int
-		var nama2 sql.NullString
-		var total_suara2 sql.NullInt64
-		var nama3 sql.NullString
-		var total_suara3 sql.NullInt64
-
-		err := rows.Scan(&kelurahan, &nama1, &total_suara1, &nama2, &total_suara2, &nama3, &total_suara3)
+		var suara1, suara2, suara3, suara4, suara5, suara6, suara7, suara8, suara9, suara10 int
+		var nama1, nama2, nama3, nama4, nama5, nama6, nama7, nama8, nama9, nama10 string
+		err = rows.Scan(&kelurahan, &nama1, &suara1, &nama2, &suara2, &nama3, &suara3, &nama4, &suara4, &nama5, &suara5, &nama6, &suara6, &nama7, &suara7, &nama8, &suara8, &nama9, &suara9, &nama10, &suara10)
 		if err != nil {
 			log.Fatal(err)
 		}
-
-		resultRow := make(map[string]interface{})
-		resultRow["kelurahan"] = kelurahan
-		suara := []map[string]interface{}{}
-		if nama1 != "" {
-			suara = append(suara, map[string]interface{}{"nama_1": nama1, "total_suara_1": total_suara1})
+		suara := []map[string]interface{}{
+			{"nama_1": nama1, "total_suara": suara1},
+			{"nama_2": nama2, "total_suara": suara2},
+			{"nama_3": nama3, "total_suara": suara3},
+			{"nama_4": nama4, "total_suara": suara4},
+			{"nama_5": nama5, "total_suara": suara5},
+			{"nama_6": nama6, "total_suara": suara6},
+			{"nama_7": nama7, "total_suara": suara7},
+			{"nama_8": nama8, "total_suara": suara8},
+			{"nama_9": nama9, "total_suara": suara9},
+			{"nama_10": nama10, "total_suara": suara10},
 		}
-		if nama2.Valid {
-			suara = append(suara, map[string]interface{}{"nama_2": nama2.String, "total_suara_2": int(total_suara2.Int64)})
-		}
-		if nama3.Valid {
-			suara = append(suara, map[string]interface{}{"nama_3": nama3.String, "total_suara_3": int(total_suara3.Int64)})
-		}
-		resultRow["suara"] = suara
-
-		result = append(result, resultRow)
+		result = append(result, map[string]interface{}{"kelurahan": kelurahan, "suara": suara})
 	}
-
-	response, err := json.Marshal(result)
-	if err != nil {
+	if err = rows.Err(); err != nil {
 		log.Fatal(err)
 	}
 
+	// Set response header
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-	w.WriteHeader(http.StatusOK)
-	w.Write(response)
+
+	// Encode and return the response data
+	err = json.NewEncoder(w).Encode(result)
+	if err != nil {
+		log.Fatal(err)
+	}
 }
