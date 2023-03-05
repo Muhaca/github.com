@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"math"
 	"net/http"
 	"strconv"
 
@@ -14,6 +15,64 @@ import (
 )
 
 // select all data with pagination
+// func AllEmployee(w http.ResponseWriter, r *http.Request) {
+// 	var employee model.Employee
+// 	var response model.Response
+// 	var arrEmployee []model.Employee
+
+// 	db := config.Connect()
+// 	defer db.Close()
+
+// 	// Get page and perPage query parameters
+// 	page, err := strconv.Atoi(r.URL.Query().Get("page"))
+// 	if err != nil {
+// 		page = 1
+// 	}
+
+// 	perPage, err := strconv.Atoi(r.URL.Query().Get("perPage"))
+// 	if err != nil {
+// 		perPage = 10
+// 	}
+
+// 	// Calculate offset based on page and perPage
+// 	offset := (page - 1) * perPage
+
+// 	// Construct SQL query with LIMIT and OFFSET clauses
+// 	query := fmt.Sprintf("SELECT id, nama, kecamatan, kelurahan, user, tps, jumlah_suara, gambar FROM voting LIMIT %d OFFSET %d", perPage, offset)
+
+// 	rows, err := db.Query(query)
+
+// 	if err != nil {
+// 		log.Print(err)
+// 	}
+
+// 	for rows.Next() {
+// 		err = rows.Scan(
+// 			&employee.Id,
+// 			&employee.Nama,
+// 			&employee.Kecamatan,
+// 			&employee.Kelurahan,
+// 			&employee.User,
+// 			&employee.TPS,
+// 			&employee.JumlahSuara,
+// 			&employee.Gambar,
+// 		)
+// 		if err != nil {
+// 			log.Fatal(err.Error())
+// 		} else {
+// 			arrEmployee = append(arrEmployee, employee)
+// 		}
+// 	}
+
+// 	response.Status = 200
+// 	response.Message = "Success"
+// 	response.Data = arrEmployee
+
+// 	w.Header().Set("Content-Type", "application/json")
+// 	w.Header().Set("Access-Control-Allow-Origin", "*")
+// 	json.NewEncoder(w).Encode(response)
+// }
+
 func AllEmployee(w http.ResponseWriter, r *http.Request) {
 	var employee model.Employee
 	var response model.Response
@@ -22,7 +81,7 @@ func AllEmployee(w http.ResponseWriter, r *http.Request) {
 	db := config.Connect()
 	defer db.Close()
 
-	// Get page and perPage query parameters
+	// Get the page and perPage query parameters from the request
 	page, err := strconv.Atoi(r.URL.Query().Get("page"))
 	if err != nil {
 		page = 1
@@ -33,13 +92,23 @@ func AllEmployee(w http.ResponseWriter, r *http.Request) {
 		perPage = 10
 	}
 
-	// Calculate offset based on page and perPage
+	// Calculate the offset and limit based on the page and perPage values
 	offset := (page - 1) * perPage
+	limit := perPage
 
-	// Construct SQL query with LIMIT and OFFSET clauses
-	query := fmt.Sprintf("SELECT id, nama, kecamatan, kelurahan, user, tps, jumlah_suara, gambar, created_at FROM voting LIMIT %d OFFSET %d", perPage, offset)
+	// Query the database to get the total number of rows
+	var totalRows int
+	err = db.QueryRow("SELECT COUNT(*), created_at FROM voting").Scan(&totalRows)
+	if err != nil {
+		log.Print(err)
+	}
 
-	rows, err := db.Query(query)
+	// Query the database to get the employees for the current page
+	rows, err := db.Query(`
+		SELECT id, nama, kecamatan, kelurahan, user, tps, jumlah_suara, gambar 
+		FROM voting
+		LIMIT ? OFFSET ?
+	`, limit, offset)
 
 	if err != nil {
 		log.Print(err)
@@ -64,13 +133,26 @@ func AllEmployee(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
+	// Calculate the total number of pages
+	totalPages := int(math.Ceil(float64(totalRows) / float64(perPage)))
+
+	// Create the meta object for the response
+	meta := model.Meta{
+		Page:       page,
+		PerPage:    perPage,
+		TotalRows:  totalRows,
+		TotalPages: totalPages,
+	}
+
 	response.Status = 200
 	response.Message = "Success"
+	response.Meta = meta
 	response.Data = arrEmployee
 
 	w.Header().Set("Content-Type", "application/json")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	json.NewEncoder(w).Encode(response)
+
 }
 
 // AllEmployee = Select Employee API
