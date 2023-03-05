@@ -613,6 +613,7 @@ func GetAllData(w http.ResponseWriter, r *http.Request) {
 
 	// Set response header
 	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
 
 	// Encode and return the response data
 	err = json.NewEncoder(w).Encode(result)
@@ -736,8 +737,8 @@ func GetAllDataKel(w http.ResponseWriter, r *http.Request) {
 	var result []map[string]interface{}
 	for rows.Next() {
 		var kelurahan string
-		var suara1, suara2, suara3, suara4, suara5, suara6, suara7, suara8, suara9, suara10 int
-		var nama1, nama2, nama3, nama4, nama5, nama6, nama7, nama8, nama9, nama10 string
+		var suara1, suara2, suara3, suara4, suara5, suara6, suara7, suara8, suara9, suara10 sql.NullInt64
+		var nama1, nama2, nama3, nama4, nama5, nama6, nama7, nama8, nama9, nama10 sql.NullString
 		err = rows.Scan(&kelurahan, &nama1, &suara1, &nama2, &suara2, &nama3, &suara3, &nama4, &suara4, &nama5, &suara5, &nama6, &suara6, &nama7, &suara7, &nama8, &suara8, &nama9, &suara9, &nama10, &suara10)
 		if err != nil {
 			log.Fatal(err)
@@ -762,6 +763,7 @@ func GetAllDataKel(w http.ResponseWriter, r *http.Request) {
 
 	// Set response header
 	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
 
 	// Encode and return the response data
 	err = json.NewEncoder(w).Encode(result)
