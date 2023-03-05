@@ -13,7 +13,7 @@ import (
 	"github.com/config"
 )
 
-// AllEmployee = Select Employee API
+// select all data with pagination
 func AllEmployee(w http.ResponseWriter, r *http.Request) {
 	var employee model.Employee
 	var response model.Response
@@ -22,7 +22,24 @@ func AllEmployee(w http.ResponseWriter, r *http.Request) {
 	db := config.Connect()
 	defer db.Close()
 
-	rows, err := db.Query("SELECT id, nama, kecamatan, kelurahan, user, tps, jumlah_suara, gambar, created_at FROM voting")
+	// Get page and perPage query parameters
+	page, err := strconv.Atoi(r.URL.Query().Get("page"))
+	if err != nil {
+		page = 1
+	}
+
+	perPage, err := strconv.Atoi(r.URL.Query().Get("perPage"))
+	if err != nil {
+		perPage = 10
+	}
+
+	// Calculate offset based on page and perPage
+	offset := (page - 1) * perPage
+
+	// Construct SQL query with LIMIT and OFFSET clauses
+	query := fmt.Sprintf("SELECT id, nama, kecamatan, kelurahan, user, tps, jumlah_suara, gambar, created_at FROM voting LIMIT %d OFFSET %d", perPage, offset)
+
+	rows, err := db.Query(query)
 
 	if err != nil {
 		log.Print(err)
@@ -54,7 +71,6 @@ func AllEmployee(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	json.NewEncoder(w).Encode(response)
-
 }
 
 // AllEmployee = Select Employee API
