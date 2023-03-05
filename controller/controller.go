@@ -105,7 +105,7 @@ func AllEmployee(w http.ResponseWriter, r *http.Request) {
 
 	// Query the database to get the employees for the current page
 	rows, err := db.Query(`
-		SELECT id, nama, kecamatan, kelurahan, user, tps, jumlah_suara, gambar 
+		SELECT id, nama, kecamatan, kelurahan, user, tps, jumlah_suara, gambar, created_at
 		FROM voting
 		LIMIT ? OFFSET ?
 	`, limit, offset)
