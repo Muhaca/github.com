@@ -447,16 +447,16 @@ func GetAllData(w http.ResponseWriter, r *http.Request) {
 			log.Fatal(err)
 		}
 		suara := []map[string]interface{}{
-			{"nama_1": nama1, "total_suara": suara1},
-			{"nama_2": nama2, "total_suara": suara2},
-			{"nama_3": nama3, "total_suara": suara3},
-			{"nama_4": nama4, "total_suara": suara4},
-			{"nama_5": nama5, "total_suara": suara5},
-			{"nama_6": nama6, "total_suara": suara6},
-			{"nama_7": nama7, "total_suara": suara7},
-			{"nama_8": nama8, "total_suara": suara8},
-			{"nama_9": nama9, "total_suara": suara9},
-			{"nama_10": nama10, "total_suara": suara10},
+			{"nama_1": nama1, "total_suara_1": suara1},
+			{"nama_2": nama2, "total_suara_2": suara2},
+			{"nama_3": nama3, "total_suara_3": suara3},
+			{"nama_4": nama4, "total_suara_4": suara4},
+			{"nama_5": nama5, "total_suara_5": suara5},
+			{"nama_6": nama6, "total_suara_6": suara6},
+			{"nama_7": nama7, "total_suara_7": suara7},
+			{"nama_8": nama8, "total_suara_8": suara8},
+			{"nama_9": nama9, "total_suara_9": suara9},
+			{"nama_10": nama10, "total_suara_10": suara10},
 		}
 		result = append(result, map[string]interface{}{"kecamatan": kecamatan, "suara": suara})
 	}
@@ -529,16 +529,16 @@ func GetAllDataKel(w http.ResponseWriter, r *http.Request) {
 			log.Fatal(err)
 		}
 		suara := []map[string]interface{}{
-			{"nama_1": replaceNullString(nama1), "total_suara": replaceNullInt(suara1)},
-			{"nama_2": replaceNullString(nama2), "total_suara": replaceNullInt(suara2)},
-			{"nama_3": replaceNullString(nama3), "total_suara": replaceNullInt(suara3)},
-			{"nama_4": replaceNullString(nama4), "total_suara": replaceNullInt(suara4)},
-			{"nama_5": replaceNullString(nama5), "total_suara": replaceNullInt(suara5)},
-			{"nama_6": replaceNullString(nama6), "total_suara": replaceNullInt(suara6)},
-			{"nama_7": replaceNullString(nama7), "total_suara": replaceNullInt(suara7)},
-			{"nama_8": replaceNullString(nama8), "total_suara": replaceNullInt(suara8)},
-			{"nama_9": replaceNullString(nama9), "total_suara": replaceNullInt(suara9)},
-			{"nama_10": replaceNullString(nama10), "total_suara": replaceNullInt(suara10)},
+			{"nama_1": replaceNullString(nama1), "total_suara_1": replaceNullInt(suara1)},
+			{"nama_2": replaceNullString(nama2), "total_suara_2": replaceNullInt(suara2)},
+			{"nama_3": replaceNullString(nama3), "total_suara_3": replaceNullInt(suara3)},
+			{"nama_4": replaceNullString(nama4), "total_suara_4": replaceNullInt(suara4)},
+			{"nama_5": replaceNullString(nama5), "total_suara_5": replaceNullInt(suara5)},
+			{"nama_6": replaceNullString(nama6), "total_suara_6": replaceNullInt(suara6)},
+			{"nama_7": replaceNullString(nama7), "total_suara_7": replaceNullInt(suara7)},
+			{"nama_8": replaceNullString(nama8), "total_suara_8": replaceNullInt(suara8)},
+			{"nama_9": replaceNullString(nama9), "total_suara_9": replaceNullInt(suara9)},
+			{"nama_10": replaceNullString(nama10), "total_suara_10": replaceNullInt(suara10)},
 		}
 		result = append(result, map[string]interface{}{"kelurahan": kelurahan, "suara": suara})
 	}
