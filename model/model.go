@@ -1,5 +1,12 @@
 package model
 
+type Meta struct {
+	Page       int `json:"page"`
+	PerPage    int `json:"per_page"`
+	TotalRows  int `json:"total_rows"`
+	TotalPages int `json"total_page"`
+}
+
 type Employee struct {
 	Id          string `form:"id" json:"id"`
 	Nama        string `form:"nama" json:"nama"`
@@ -17,9 +24,10 @@ type Kandidat struct {
 }
 
 type Response struct {
-	Status  int    `json:"status"`
-	Message string `json:"message"`
-	Data    []Employee
+	Status  int         `json:"status"`
+	Message string      `json:"message"`
+	Data    interface{} `json:"data"`
+	Meta    Meta        `json:"meta"`
 }
 
 type ResponseKandidat struct {
