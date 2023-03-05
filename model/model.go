@@ -9,6 +9,7 @@ type Employee struct {
 	TPS         string `form:"tps" json:"tps"`
 	Gambar      string `form:"gambar" json:"gambar"`
 	JumlahSuara int    `form:"jumlah_suara" json":"jumlah_suara"`
+	CreatedAt   string `form:"created_at" json:"created_at"`
 }
 type Kandidat struct {
 	Id     string `form:"id" json:"id"`

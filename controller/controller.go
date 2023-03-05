@@ -22,7 +22,7 @@ func AllEmployee(w http.ResponseWriter, r *http.Request) {
 	db := config.Connect()
 	defer db.Close()
 
-	rows, err := db.Query("SELECT id, nama, kecamatan, kelurahan, user, tps, jumlah_suara, gambar FROM voting")
+	rows, err := db.Query("SELECT id, nama, kecamatan, kelurahan, user, tps, jumlah_suara, gambar, created_at FROM voting")
 
 	if err != nil {
 		log.Print(err)
@@ -38,6 +38,7 @@ func AllEmployee(w http.ResponseWriter, r *http.Request) {
 			&employee.TPS,
 			&employee.JumlahSuara,
 			&employee.Gambar,
+			&employee.CreatedAt,
 		)
 		if err != nil {
 			log.Fatal(err.Error())
@@ -222,7 +223,7 @@ func InsertEmployee(w http.ResponseWriter, r *http.Request) {
 	jumlah_suara := r.FormValue("jumlah_suara")
 	gambar := r.FormValue("gambar")
 
-	_, err = db.Exec("INSERT INTO voting(nama, kelurahan, kecamatan, user,tps, jumlah_suara, gambar) VALUES(?, ?, ?, ?, ?, ?, ?)", nama, kelurahan, kecamatan, user, tps, jumlah_suara, gambar)
+	_, err = db.Exec("INSERT INTO voting(nama, kelurahan, kecamatan, user,tps, jumlah_suara, gambar, created_at) VALUES(?, ?, ?, ?, ?, ?, ?, now())", nama, kelurahan, kecamatan, user, tps, jumlah_suara, gambar)
 
 	if err != nil {
 		log.Print(err)
@@ -397,10 +398,15 @@ func GetAllData(w http.ResponseWriter, r *http.Request) {
 	// Open database connection
 	db := config.Connect()
 	defer db.Close()
+	var rows *sql.Rows
+	var err error
 
 	// Execute the query
-	rows, err := db.Query(`
-        SELECT kecamatan, 
+	kecamatan := r.URL.Query().Get("kecamatan")
+
+	if kecamatan == "" {
+		rows, err = db.Query(`
+        SELECT kecamatan,													
 		MAX(CASE WHEN rn = 1 THEN nama END) AS nama_1, 
 		MAX(CASE WHEN rn = 1 THEN jumlah_suara END) AS total_suara_1,
 		MAX(CASE WHEN rn = 2 THEN nama END) AS nama_2, 
@@ -431,6 +437,43 @@ func GetAllData(w http.ResponseWriter, r *http.Request) {
         WHERE rn <= 10
         GROUP BY kecamatan
     `)
+	} else {
+		rows, err = db.Query(`
+        SELECT 	kecamatan,													
+		MAX(CASE WHEN rn = 1 THEN nama END) AS nama_1, 
+		MAX(CASE WHEN rn = 1 THEN jumlah_suara END) AS total_suara_1,
+		MAX(CASE WHEN rn = 2 THEN nama END) AS nama_2, 
+		MAX(CASE WHEN rn = 2 THEN jumlah_suara END) AS total_suara_2,
+		MAX(CASE WHEN rn = 3 THEN nama END) AS nama_3, 
+		MAX(CASE WHEN rn = 3 THEN jumlah_suara END) AS total_suara_3,
+		COALESCE(MAX(CASE WHEN rn = 4 THEN nama END), '') AS nama_4, 
+		COALESCE(MAX(CASE WHEN rn = 4 THEN jumlah_suara END), 0) AS total_suara_4,
+		COALESCE(MAX(CASE WHEN rn = 5 THEN nama END), '') AS nama_5, 
+		COALESCE(MAX(CASE WHEN rn = 5 THEN jumlah_suara END), 0) AS total_suara_5,
+		COALESCE(MAX(CASE WHEN rn = 6 THEN nama END), '') AS nama_6, 
+		COALESCE(MAX(CASE WHEN rn = 6 THEN jumlah_suara END), 0) AS total_suara_6,
+		COALESCE(MAX(CASE WHEN rn = 7 THEN nama END), '') AS nama_7, 
+		COALESCE(MAX(CASE WHEN rn = 7 THEN jumlah_suara END), 0) AS total_suara_7,
+		COALESCE(MAX(CASE WHEN rn = 8 THEN nama END), '') AS nama_8, 
+		COALESCE(MAX(CASE WHEN rn = 8 THEN jumlah_suara END), 0) AS total_suara_8,
+		COALESCE(MAX(CASE WHEN rn = 9 THEN nama END), '') AS nama_9, 
+		COALESCE(MAX(CASE WHEN rn = 9 THEN jumlah_suara END), 0) AS total_suara_9,
+		COALESCE(MAX(CASE WHEN rn = 10 THEN nama END), '') AS nama_10, 
+		COALESCE(MAX(CASE WHEN rn = 10 THEN jumlah_suara END), 0) AS total_suara_10
+        FROM (
+            SELECT kecamatan, 
+                   nama, 
+                   jumlah_suara, 
+                   ROW_NUMBER() OVER (PARTITION BY kecamatan ORDER BY jumlah_suara DESC) AS rn
+            FROM voting
+
+			where kecamatan = ?
+        ) t
+        WHERE rn <= 10
+        GROUP BY kecamatan
+    `, kecamatan)
+	}
+
 	if err != nil {
 		log.Fatal(err)
 	}
