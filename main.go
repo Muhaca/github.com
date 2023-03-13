@@ -25,8 +25,8 @@ func main() {
 	router.HandleFunc("/insertemployee", controller.InsertEmployee).Methods("POST")
 	router.HandleFunc("/insertkandidat", controller.InsertKandidat).Methods("POST")
 	http.Handle("/", router)
-	fmt.Println("Connected to port 1234")
-	log.Fatal(http.ListenAndServe(":1234", router))
+	fmt.Println("Connected to port 8080")
+	log.Fatal(http.ListenAndServe(":8080", router))
 }
 
 // package main
