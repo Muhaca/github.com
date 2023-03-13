@@ -7,7 +7,7 @@ import (
 func Connect() *sql.DB {
 	dbDriver := "mysql"
 	dbUser := "root"
-	dbPass := ""
+	dbPass := "password"
 	dbName := "test"
 
 	db, err := sql.Open(dbDriver, dbUser+":"+dbPass+"@/"+dbName)
