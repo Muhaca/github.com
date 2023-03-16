@@ -25,8 +25,8 @@ func main() {
 	router.HandleFunc("/insertemployee", controller.InsertEmployee).Methods("POST")
 	router.HandleFunc("/insertkandidat", controller.InsertKandidat).Methods("POST")
 	http.Handle("/", router)
-	fmt.Println("Connected to port 8080")
-	log.Fatal(http.ListenAndServe(":8080", router))
+	fmt.Println("Connected to port 2323")
+	log.Fatal(http.ListenAndServe(":2323", router))
 }
 
 // package main
@@ -51,7 +51,7 @@ func main() {
 // 	e.PUT("/tasks", handlers.EditTask(db))
 // 	e.DELETE("/tasks/:id", handlers.DeleteTask(db))
 
-// 	e.Logger.Fatal(e.Start(":8000"))
+// 	e.Logger.Fatal(e.Start(":2323"))
 // }
 
 // func initDB(filepath string) *sql.DB {
