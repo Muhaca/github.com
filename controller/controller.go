@@ -151,6 +151,7 @@ func AllEmployee(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
 	json.NewEncoder(w).Encode(response)
 
 }
@@ -185,6 +186,7 @@ func GetKecamatan(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
 	json.NewEncoder(w).Encode(resp)
 
 }
@@ -224,6 +226,7 @@ func GetKelurahan(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
 	json.NewEncoder(w).Encode(kelurahanList)
 }
 
@@ -256,6 +259,7 @@ func GetKandidat(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
 	json.NewEncoder(w).Encode(response)
 
 }
@@ -333,6 +337,8 @@ func InsertEmployee(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+
 	json.NewEncoder(w).Encode(response)
 }
 
@@ -363,6 +369,8 @@ func InsertKandidat(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+
 	json.NewEncoder(w).Encode(response)
 }
 
@@ -421,6 +429,8 @@ func GetDataHandler(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+
 	w.WriteHeader(http.StatusOK)
 	w.Write(jsonResult)
 }
@@ -480,6 +490,8 @@ func GetDataKelurahan(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+
 	w.WriteHeader(http.StatusOK)
 	w.Write(jsonResult)
 }
@@ -608,6 +620,7 @@ func GetAllData(w http.ResponseWriter, r *http.Request) {
 	// Set response header
 	w.Header().Set("Content-Type", "application/json")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
 
 	// Encode and return the response data
 	err = json.NewEncoder(w).Encode(result)
@@ -732,6 +745,7 @@ func GetAllDataKel(w http.ResponseWriter, r *http.Request) {
 	// Set response header
 	w.Header().Set("Content-Type", "application/json")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
 
 	// Encode and return the response data
 	err = json.NewEncoder(w).Encode(result)
