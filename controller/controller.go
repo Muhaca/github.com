@@ -343,10 +343,10 @@ func InsertEmployee(w http.ResponseWriter, r *http.Request) {
 }
 
 // InsertEmployee = Insert Employee API
-type Kandidat struct {
-    Nama   string `json:"nama"`
-    UserId string `json:"user_id"`
-}
+// type Kandidat struct {
+//     Nama   string `json:"nama"`
+//     UserId string `json:"user_id"`
+// }
 
 func InsertKandidat(w http.ResponseWriter, r *http.Request) {
     var response model.Response
@@ -355,7 +355,7 @@ func InsertKandidat(w http.ResponseWriter, r *http.Request) {
     defer db.Close()
 
     // Decode the JSON request body into a Kandidat struct
-    var kandidat Kandidat
+    var kandidat model.Kandidat
     err := json.NewDecoder(r.Body).Decode(&kandidat)
     if err != nil {
         http.Error(w, err.Error(), http.StatusBadRequest)
