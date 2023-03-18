@@ -343,36 +343,41 @@ func InsertEmployee(w http.ResponseWriter, r *http.Request) {
 }
 
 // InsertEmployee = Insert Employee API
-func InsertKandidat(w http.ResponseWriter, r *http.Request) {
-	var response model.Response
-
-	db := config.Connect()
-	defer db.Close()
-
-	err := r.ParseMultipartForm(4096)
-	if err != nil {
-		panic(err)
-	}
-	// id := r.FormValue("id")
-	nama := r.FormValue("nama")
-	userid := r.FormValue("user_id")
-
-	_, err = db.Exec("INSERT INTO voting_kandidat(nama, user_id) VALUES(?, ?)", nama, userid)
-
-	if err != nil {
-		log.Print(err)
-		return
-	}
-	response.Status = 200
-	response.Message = "Insert data successfully"
-	fmt.Print("Insert data to database")
-
-	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-	w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
-
-	json.NewEncoder(w).Encode(response)
+type Kandidat struct {
+    Nama   string `json:"nama"`
+    UserId string `json:"user_id"`
 }
+
+func InsertKandidat(w http.ResponseWriter, r *http.Request) {
+    var response model.Response
+
+    db := config.Connect()
+    defer db.Close()
+
+    // Decode the JSON request body into a Kandidat struct
+    var kandidat Kandidat
+    err := json.NewDecoder(r.Body).Decode(&kandidat)
+    if err != nil {
+        http.Error(w, err.Error(), http.StatusBadRequest)
+        return
+    }
+
+    _, err = db.Exec("INSERT INTO voting_kandidat(nama, user_id) VALUES(?, ?)", kandidat.Nama, kandidat.UserId)
+
+    if err != nil {
+        log.Print(err)
+        return
+    }
+    response.Status = 200
+    response.Message = "Insert data successfully"
+    fmt.Print("Insert data to database")
+
+    w.Header().Set("Content-Type", "application/json")
+    w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+    json.NewEncoder(w).Encode(response)
+}
+
 
 func GetDataHandler(w http.ResponseWriter, r *http.Request) {
 	kecamatan := r.URL.Query().Get("kecamatan")
