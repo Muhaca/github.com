@@ -362,7 +362,7 @@ func InsertKandidat(w http.ResponseWriter, r *http.Request) {
         return
     }
 
-    _, err = db.Exec("INSERT INTO voting_kandidat(nama, user_id) VALUES(?, ?)", kandidat.Nama, kandidat.UserId)
+    _, err = db.Exec("INSERT INTO voting_kandidat(nama, user_id) VALUES(?, ?)", kandidat.Nama, kandidat.UserID)
 
     if err != nil {
         log.Print(err)
